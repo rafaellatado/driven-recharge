@@ -2,6 +2,7 @@ import { Phone } from "../protocols";
 import * as phonesRepository from "../repositories/phonesRepository";
 import * as carriersRepository from "../repositories/carriersRepository";
 import { conflictError, notFoundError } from "../utils/errorUtils";
+import * as rechargesRepository from "../repositories/rechargesRepository";
 
 export async function createPhone(data: Phone) {
   const existingPhone = await phonesRepository.findByNumber(data.number);
@@ -23,3 +24,29 @@ export async function createPhone(data: Phone) {
 
   return await phonesRepository.insert(phoneToInsert);
 }
+
+export async function listPhonesByCpf(cpf: string) {
+  return await phonesRepository.findAllByCpf(cpf);
+}
+
+export async function getSummaryByCpf(cpf: string) {
+  const phones = await phonesRepository.findByCpf(cpf);
+
+  const phonesWithDetails = await Promise.all(
+    phones.map(async phone => {
+      const carrier = await carriersRepository.findById(phone.carrier_id);
+      const recharges = await rechargesRepository.findByPhoneId(phone.id);
+      return {
+        ...phone,
+        carrier,
+        recharges
+      };
+    })
+  );
+
+  return {
+    document: cpf,
+    phones: phonesWithDetails
+  };
+}
+

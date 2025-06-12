@@ -27,4 +27,34 @@ export async function insert(phone: {
   return result.rows[0];
 }
 
+export async function findAllByCpf(cpf: string) {
+  const result = await db.query(`
+    SELECT phones.*, carriers.name AS carrier_name, carriers.code AS carrier_code
+    FROM phones
+    JOIN carriers ON phones.carrier_id = carriers.id
+    WHERE phones.cpf = $1
+  `, [cpf]);
 
+  return result.rows.map(row => ({
+    id: row.id,
+    number: row.number,
+    name: row.name,
+    description: row.description,
+    cpf: row.cpf,
+    carrier: {
+      id: row.carrier_id,
+      name: row.carrier_name,
+      code: row.carrier_code
+    }
+  }));
+}
+
+export async function findById(id: number) {
+  const result = await db.query("SELECT * FROM phones WHERE id = $1", [id]);
+  return result.rows[0];
+}
+
+export async function findByCpf(cpf: string) {
+  const result = await db.query("SELECT * FROM phones WHERE cpf = $1", [cpf]);
+  return result.rows;
+}
