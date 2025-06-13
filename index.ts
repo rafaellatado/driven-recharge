@@ -2,6 +2,8 @@ import express, { Request, Response, json } from "express";
 import phonesRouter from "./src/routes/phonesRoutes";
 import { errorHandlerMiddleware } from "./src/middlewares/errorHandlerMiddleware";
 import rechargesRouter from "./src/routes/rechargesRoutes";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(json()); // parser
@@ -15,8 +17,10 @@ app.use(errorHandlerMiddleware);
 app.use(phonesRouter);
 app.use(rechargesRouter);
 
+const PORT = process.env.PORT || 5000;
 
-app.listen(5000, () => console.log(`Server is up and running`));
+app.listen(PORT, () => console.log(`Server is up and running on port ${PORT}`));
+
 
 /* Pra que serve a tipagem explícita? Quando devemos usar?
 A resposta final é relativa (o famoso “depende”), mas vamos seguir uma regrinha de ouro: 
